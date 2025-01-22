@@ -92,15 +92,31 @@ class CommentBot:
     def setup_driver(self):
         # Configurar o Chrome
         chrome_options = Options()
+        
+        # Configurações básicas
         chrome_options.add_argument('--no-sandbox')
-        chrome_options.add_argument('--window-size=1920,1080')
+        chrome_options.add_argument('--headless')  # Rodar sem interface gráfica
         chrome_options.add_argument('--disable-gpu')
         chrome_options.add_argument('--disable-dev-shm-usage')
+        chrome_options.add_argument('--disable-software-rasterizer')
+        
+        # Configurar proxy se existir no config
+        if 'proxy' in self.config:
+            proxy = self.config['proxy']
+            proxy_url = f"{proxy['protocol']}://{proxy['username']}:{proxy['password']}@{proxy['host']}:{proxy['port']}"
+            chrome_options.add_argument(f'--proxy-server={proxy_url}')
+            logging.info(f"Using proxy: {proxy['host']}:{proxy['port']}")
         
         # Configurações experimentais
         chrome_options.add_experimental_option('excludeSwitches', ['enable-automation', 'enable-logging'])
         chrome_options.add_experimental_option('useAutomationExtension', False)
 
+        # Configurações adicionais para servidor
+        chrome_options.add_argument('--disable-extensions')
+        chrome_options.add_argument('--remote-debugging-port=9222')
+        chrome_options.add_argument('--disable-setuid-sandbox')
+        chrome_options.add_argument('--window-size=1920,1080')
+        
         # Disable Google services and optimization
         chrome_options.add_argument('--disable-features=OptimizationHints')
         chrome_options.add_argument('--disable-features=OptimizationGuideModelDownloading')
