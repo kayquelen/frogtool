@@ -48,47 +48,39 @@ class CommentBot:
     def setup_authentication(self):
         """Configura a autenticação via cookie JWT"""
         logger.info("Configurando autenticação...")
-        
-        jwt_token = self.get_random_jwt()
-        
-        # Primeiro acessa a página e clica no I'm ready
-        self.driver.get("https://pump.fun")
-        time.sleep(0.5)  # Reduzir espera inicial
-        
         try:
-            # Clicar no "I'm ready to pump" antes de autenticar
-            logger.info("Procurando botão 'I'm ready to pump'...")
-            ready_button = self.short_wait.until(
-                EC.element_to_be_clickable((
-                    By.CSS_SELECTOR, 
-                    "button[data-sentry-element='Button'][data-sentry-source-file='HowItWorks.tsx']"
-                ))
-            )
-            ready_button.click()
-            logger.info("Botão 'I'm ready to pump' clicado")
-        except Exception as e:
-            logger.warning(f"Botão 'I'm ready' não encontrado, continuando mesmo assim: {e}")
+            # Primeiro navegar para o site
+            self.driver.get(self.base_url)
+            time.sleep(2)  # Esperar carregar
             
-        # Agora adiciona o cookie JWT
-        try:
+            # Adicionar cookie JWT
+            jwt_token = self.get_random_jwt()
             logger.info("Adicionando cookie JWT...")
-            self.driver.delete_all_cookies()
             self.driver.add_cookie({
-                'name': 'auth_token',
+                'name': 'jwt',
                 'value': jwt_token,
-                'domain': 'pump.fun',
+                'domain': '.pump.fun',  # Adicionar o ponto no início
                 'path': '/'
             })
-            logger.info("Cookie JWT adicionado")
             
-            # Recarregar página para aplicar o cookie
-            self.driver.refresh()
-            logger.info("Página recarregada com autenticação")
+            # Recarregar a página para aplicar o cookie
+            self.driver.get(self.base_url)
+            time.sleep(2)
             
+            # Procurar e clicar no botão "I'm ready to pump" se existir
+            try:
+                ready_button = WebDriverWait(self.driver, 10).until(
+                    EC.presence_of_element_located((By.XPATH, "//button[contains(text(), 'ready to pump')]"))
+                )
+                ready_button.click()
+                logger.info("Botão 'I'm ready' clicado com sucesso")
+            except Exception as e:
+                logger.warning(f"Botão 'I'm ready' não encontrado, continuando mesmo assim: {str(e)}")
+                
         except Exception as e:
             logger.error(f"Erro ao adicionar cookie: {str(e)}")
-            raise
-            
+            raise e
+        
     def setup_driver(self):
         # Configurar o Chrome
         chrome_options = Options()
