@@ -12,42 +12,32 @@ MINT_ID = 0
 ESCOLHER_QUANTIDADE = 1
 CHOOSE_QUANTITY = ESCOLHER_QUANTIDADE
 
-# Configuração de logs
-log_dir = "logs"
-if not os.path.exists(log_dir):
-    os.makedirs(log_dir)
-
-log_file = os.path.join(log_dir, f"bot_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
-
+# Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler(log_file),
-        logging.StreamHandler()  # Mostra logs no console também
-    ]
+    format='%(asctime)s - %(levelname)s - %(message)s'
 )
-
 logger = logging.getLogger(__name__)
 
 async def start(update, context):
     """Start command handler"""
     await update.message.reply_text(
-        "👋 Welcome! I'm here to help you post comments.\n"
+        "Welcome! I'm here to help you post comments.\n"
         "Use /comment to start commenting!"
     )
 
 async def comment(update, context):
-    """Handler for the /comment command"""
-    logger.info(f"Comando /comment recebido de {update.effective_user.id}")
+    """Inicia o processo de comentário"""
+    logger.info("Comando /comment recebido")
+    
     await update.message.reply_text(
         "Please send me the mint ID or pump.fun URL where you want to comment.\n"
         "Example: 4TgsKLurtR71jMoVMC3Un3V3fdNRFwX6Dj9ny1T9pump\n"
         "Or: https://pump.fun/coin/4TgsKLurtR71jMoVMC3Un3V3fdNRFwX6Dj9ny1T9pump"
     )
-    return MINT_ID
+    return ESCOLHER_QUANTIDADE
 
-def extract_mint_id(text):
+def clean_mint_id(text):
     """Extracts mint ID from URL or direct mint ID"""
     logger.info(f"Received text: {text}")
     
@@ -68,34 +58,39 @@ def extract_mint_id(text):
     logger.warning(f"Invalid format. Received text: {text}")
     return None
 
-async def process_mint_id(update, context):
-    mint_id = extract_mint_id(update.message.text)
+async def get_mint_id(update, context):
+    """Processa o mint ID e pede a quantidade"""
+    logger.info("Recebido possível mint ID")
+    
+    raw_mint_id = update.message.text.strip()
+    mint_id = clean_mint_id(raw_mint_id)
+    
     if not mint_id:
         await update.message.reply_text(
-            "❌ Invalid mint ID! Please send a valid mint ID or pump.fun URL\n"
+            "Invalid mint ID! Please send a valid mint ID or pump.fun URL\n"
             "Example mint ID: 4TgsKLurtR71jMoVMC3Un3V3fdNRFwX6Dj9ny1T9pump\n"
             "Example URL: https://pump.fun/coin/4TgsKLurtR71jMoVMC3Un3V3fdNRFwX6Dj9ny1T9pump"
         )
-        return MINT_ID
+        return ESCOLHER_QUANTIDADE
     
     context.user_data['mint_id'] = mint_id
-    logger.info(f"Mint ID received: {mint_id}")
+    logger.info(f"Valid mint ID: {mint_id}")
     
-    # Create inline keyboard with quantity options
+    # Criar botões inline para quantidade
     keyboard = [
         [InlineKeyboardButton("1", callback_data='1'),
          InlineKeyboardButton("2", callback_data='2'),
          InlineKeyboardButton("3", callback_data='3')],
         [InlineKeyboardButton("5", callback_data='5'),
-         InlineKeyboardButton("10", callback_data='10')]
+         InlineKeyboardButton("10", callback_data='10'),
+         InlineKeyboardButton("20", callback_data='20')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
     await update.message.reply_text(
-        f"✅ Valid mint ID! Now choose how many comments you want to make:",
+        "Valid mint ID! Now choose how many comments you want to make:",
         reply_markup=reply_markup
     )
-    
     return ESCOLHER_QUANTIDADE
 
 async def process_quantity(update, context):
@@ -105,61 +100,71 @@ async def process_quantity(update, context):
     try:
         mint_id = context.user_data.get('mint_id')
         if not mint_id:
-            await query.message.reply_text("❌ Error: Mint ID not found. Please use /comment again.")
+            await query.message.reply_text("Error: Mint ID not found. Please use /comment again.")
             return ConversationHandler.END
             
-        num_comments = int(query.data)
-        logger.info(f"Starting process for {num_comments} comments on mint {mint_id}")
+        num_comentarios = int(query.data)
+        logger.info(f"Starting bot...")
+        logger.info(f"Processing {num_comentarios} comments for mint ID: {mint_id}")
         
-        # Execute test_commenter.py with parameters
-        import subprocess
-        import sys
-        import os
-
-        for i in range(num_comments):
+        # Load configuration
+        logger.info("Loading config.json...")
+        with open("config.json", "r") as f:
+            config = json.load(f)
+            
+        # Show proxy information
+        if config.get('proxies'):
+            logger.info(f"Proxies found: {len(config['proxies'])}")
+            for i, proxy in enumerate(config['proxies'], 1):
+                logger.info(f"Proxy #{i}: {proxy['protocol']}://{proxy['host']}:{proxy['port']}")
+        else:
+            logger.warning("No proxy configured in config.json")
+            
+        comentarios = [
+            "Amazing project",
+            "Great work",
+            "Love this project",
+            "Fantastic project",
+            "Impressive work",
+            "This is brilliant",
+            "Excellent project",
+            "Super excited about this"
+        ]
+        
+        # Initialize bot
+        logger.info("Initializing bot with settings...")
+        bot = CommentBot(
+            config_path="config.json",
+            delay_range=(1, 3),
+            proxies=None
+        )
+        
+        await query.message.reply_text(f"Starting {num_comentarios} comments... Check console for progress.")
+        
+        sucessos = 0
+        for i in range(num_comentarios):
+            comentario = random.choice(comentarios)
+            logger.info(f"Comment to be posted ({i+1}/{num_comentarios}): {comentario}")
+            
             try:
-                logger.info(f"Executing comment {i+1} of {num_comments}")
-                
-                # Configure environment variables for test_commenter
-                env = os.environ.copy()
-                env['MINT_ID'] = mint_id
-                
-                # Execute test_commenter.py
-                process = subprocess.Popen(
-                    [sys.executable, 'test_commenter.py'],
-                    env=env,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    text=True,
-                    bufsize=1,
-                    universal_newlines=True
-                )
-                
-                # Read output in real-time
-                success = False
-                while True:
-                    output = process.stdout.readline()
-                    if output == '' and process.poll() is not None:
-                        break
-                    if output:
-                        output = output.strip()
-                        logger.info(output)  
-                        if "✅ Comment posted successfully" in output:
-                            success = True
-                
-                # Get return code 
-                return_code = process.poll()
-                    
+                success = bot.post_comment(mint_id, comentario)
+                if success:
+                    sucessos += 1
+                    logger.info(f"Comment {i+1}/{num_comentarios} posted successfully on mint {mint_id}")
+                else:
+                    logger.error(f"Failed to post comment {i+1}/{num_comentarios} on mint {mint_id}")
             except Exception as e:
-                logger.error(f"Error executing test_commenter.py: {str(e)}")
+                logger.error(f"Error posting comment {i+1}/{num_comentarios}: {str(e)}")
+                
+        logger.info(f"Process finished. {sucessos}/{num_comentarios} comments posted successfully")
+        await query.message.reply_text(f"Process finished. {sucessos}/{num_comentarios} comments posted successfully.")
         
-        # Only show final message
-        await query.message.reply_text(f"✅ Process completed! {num_comments} comments processed.")
+        return ConversationHandler.END
         
     except Exception as e:
-        logger.error(f"Critical error: {str(e)}")
-    
-    return ConversationHandler.END
+        logger.error(f"Critical error in process: {str(e)}")
+        await query.message.reply_text("An error occurred.")
+        return ConversationHandler.END
 
 def main():
     """Start the bot"""
@@ -170,12 +175,14 @@ def main():
     # Create application
     application = Application.builder().token(config['telegram_token']).build()
 
-    # Add conversation handler
+    # Conversation handler
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('comment', comment)],
         states={
-            MINT_ID: [MessageHandler(filters.TEXT & ~filters.COMMAND, process_mint_id)],
-            ESCOLHER_QUANTIDADE: [CallbackQueryHandler(process_quantity)]
+            ESCOLHER_QUANTIDADE: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, get_mint_id),
+                CallbackQueryHandler(process_quantity)
+            ]
         },
         fallbacks=[CommandHandler('cancel', lambda u,c: ConversationHandler.END)]
     )
