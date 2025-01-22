@@ -1,0 +1,31 @@
+{
+    "jwt_tokens": [
+    
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZGRyZXNzIjoiSG5RMjJHamo4TEZRR1liTkZjRGR2UDJmV3RRSjE1RHZQWHFQc2N1RWdvQjQiLCJyb2xlcyI6WyJ1c2VyIl0sImdyb3VwIjoidGVzdCIsImVyYSI6IkZFQVRVUkVEIHYxLjYiLCJlcmFzIjpbeyJlcmEiOiJGRUFUVVJFRCB2MS42IiwiZ3JvdXAiOiJ0ZXN0In0seyJlcmEiOiJTRUFSQ0h2MS4wTUVUQVN2MS4wIiwiZ3JvdXAiOiJ0ZXN0In0seyJlcmEiOiJUUkVORElOR19DQVJPVVNFTHYxLjAiLCJncm91cCI6ImNvbnRyb2wifSx7ImVyYSI6IldBVENITElTVHYxLjAiLCJncm91cCI6InRlc3QifSx7ImVyYSI6IlNFTUFOVElDX1NFQVJDSHYxLjAiLCJncm91cCI6ImNvbnRyb2wifSx7ImVyYSI6IlNJTUlMQVJfQ09JTlN2MS4wIiwiZ3JvdXAiOiJjb250cm9sIn0seyJlcmEiOiJDT0lOX1JFQ1NfRlJPTV9UUkFERV9ISVNUT1JZdjEuMCIsImdyb3VwIjoiY29udHJvbCJ9XSwiaWF0IjoxNzM3NDUzOTI2LCJleHAiOjE3NDAwNDU5MjZ9.FjC_ESP2vNGsfn3X3hNPyERvFg6gLQIwqFWpq80VVoo",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZGRyZXNzIjoiSG5RMjJHamo4TEZRR1liTkZjRGR2UDJmV3RRSjE1RHZQWHFQc2N1RWdvQjQiLCJyb2xlcyI6WyJ1c2VyIl0sImdyb3VwIjoidGVzdCIsImVyYSI6IkZFQVRVUkVEIHYxLjYiLCJlcmFzIjpbeyJlcmEiOiJGRUFUVVJFRCB2MS42IiwiZ3JvdXAiOiJ0ZXN0In0seyJlcmEiOiJTRUFSQ0h2MS4wTUVUQVN2MS4wIiwiZ3JvdXAiOiJ0ZXN0In0seyJlcmEiOiJUUkVORElOR19DQVJPVVNFTHYxLjAiLCJncm91cCI6ImNvbnRyb2wifSx7ImVyYSI6IldBVENITElTVHYxLjAiLCJncm91cCI6ImNvbnRyb2wifSx7ImVyYSI6IlNFTUFOVElDX1NFQVJDSHYxLjAiLCJncm91cCI6ImNvbnRyb2wifSx7ImVyYSI6IlNJTUlMQVJfQ09JTlN2MS4wIiwiZ3JvdXAiOiJjb250cm9sIn0seyJlcmEiOiJDT0lOX1JFQ1NfRlJPTV9UUkFERV9ISVNUT1JZdjEuMCIsImdyb3VwIjoiY29udHJvbCJ9XSwiaWF0IjoxNzM3NDg4MzI2LCJleHAiOjE3NDAwODAzMjZ9.3m9xyFnERU2pWkOlEjQlwcrxycsMdDVs9U0ladIVO0Q"
+    ],
+    "comments": [
+      "Awesome project! ",
+      "Great work! ",
+      "Looking forward to more updates! ",
+      "This is amazing! ",
+      "Keep up the good work! "
+    ],
+    "mint_ids": [
+      "4TgsKLurtR71jMoVMC3Un3V3fdNRFwX6Dj9ny1T9pump"
+    ],
+    "proxy": {
+      "host": "gw.dataimpulse.com",
+      "port": 823,
+      "username": "0b6deb54f22f043daabd",
+      "password": "6771ce010b3a1c40",
+      "protocol": "http"
+    },
+    "telegram_token": "7366702033:AAHd-0Log4iLjpKIICPrsk0bK0SRwArDbs8",
+    "email_settings": {
+      "imap_server": "imap.gmail.com",
+      "username": "jermiaabnerte@gmail.com",
+      "password": "Jhonn@37",
+      "domain": "gmail.com"
+    }
+  }
